@@ -69,7 +69,7 @@ typedef struct {
     uint16_t fastPollTimeoutMax;
 } zcl_pollCtrlAttr_t;
 
-typedef struct{
+typedef struct {
     u8 switchType;
     u8 switchActions;
 } zcl_onOffSwitchCfg_t;

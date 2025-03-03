@@ -79,6 +79,12 @@
 /*
  * 0x04 - Watermeter
  * 0x07 - ElectricityMeter
+ * 0x08 - Template
+ * 0x09 - Remote Control
+ * 0x0a - Livolo_switch_2keys
+ * 0x0b - Livolo_switch_1key
+ * 0x0c - Livolo_switch_1key_dimmable
+ * 0x0d - Smoke_sensor
  */
 
 #define IMAGE_TYPE_APP              (0x0D | (IMAGE_TYPE_BOOT_FLAG << 7))
