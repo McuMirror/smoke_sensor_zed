@@ -29,6 +29,7 @@ const definition = {
             "attribute": 'switchActions',
             "description": 'Actions switch'}),
         ],
+		
     meta: {},
     ota: true,
 };
