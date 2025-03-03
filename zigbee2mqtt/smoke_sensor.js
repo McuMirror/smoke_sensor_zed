@@ -30,6 +30,7 @@ const definition = {
             "description": 'Actions switch'}),
         ota(),
         ],
+		
     meta: {},
     ota: true,
 };
