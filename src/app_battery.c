@@ -4,6 +4,8 @@
 #include "app_main.h"
 
 #define VOLTAGE_FACTOR  120
+#define VF_ADDRESS      (CFG_PRE_INSTALL_CODE + 0x100)
+#define ADC_CALIBRATION_ID      0x1965
 
 static uint8_t voltage_factor = VOLTAGE_FACTOR;
 
@@ -52,12 +54,11 @@ static uint8_t voltage_factor = VOLTAGE_FACTOR;
  *  2210 * 3 - VOLTAGE_FACTOR = 6510
  */
 
-
-
 static void voltage_divisor_en(uint8_t on) {
     if (on) drv_gpio_write(VOLTAGE_DIVISOR_PIN_EN, ON);
     else drv_gpio_write(VOLTAGE_DIVISOR_PIN_EN, OFF);
 }
+
 // 2200..3100 mv - 0..100%
 static uint8_t get_battery_level(uint16_t battery_mv) {
     /* Zigbee 0% - 0x0, 50% - 0x64, 100% - 0xc8 */
@@ -151,18 +152,23 @@ int32_t batteryCb(void *arg) {
 
 void battery_init(bool isRetention) {
 
-    uint8_t adc_calibration[4] = {0};
+    adc_calibration_t adc_calibration = {0};
 
     if (!isRetention) {
-        flash_read(CFG_ADC_CALIBRATION, 4, adc_calibration);
 
-        if (adc_calibration[0] == 0x19 && adc_calibration[1] == 0x65) {
-//        printf("voltage_factor from flash\r\n");
-            voltage_factor = adc_calibration[2];
+        flash_read(VF_ADDRESS, 4, (uint8_t*)&adc_calibration);
+
+        if (adc_calibration.id == ADC_CALIBRATION_ID) {
+#if UART_PRINTF_MODE && DEBUG_BATTERY
+            printf("voltage_factor from flash\r\n");
+#endif
+            voltage_factor = adc_calibration.voltage_factor;
             /* voltage_factor should not be 0 */
             if (voltage_factor == 0) voltage_factor++;
         } else {
-//        printf("voltage_factor from #define\r\n");
+#if UART_PRINTF_MODE && DEBUG_BATTERY
+            printf("voltage_factor from #define\r\n");
+#endif
             voltage_factor = VOLTAGE_FACTOR;
         }
     }

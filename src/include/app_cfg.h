@@ -66,6 +66,7 @@ extern "C" {
 #define	UART_PRINTF_MODE                OFF
 #define USB_PRINTF_MODE                 OFF
 
+#define DEBUG_BUTTON                    OFF
 #define DEBUG_REPORTING                 OFF
 #define DEBUG_SMOKE                     OFF
 #define DEBUG_BATTERY                   OFF

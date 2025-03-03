@@ -31,6 +31,7 @@ const definition = {
         ota(),
         ],
     meta: {},
+    ota: true,
 };
 
 module.exports = definition;

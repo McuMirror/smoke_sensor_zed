@@ -20,15 +20,26 @@ LIBS := -lzb_ed -ldrivers_8258
 DEVICE_TYPE = -DEND_DEVICE=1
 MCU_TYPE = -DMCU_CORE_8258=1
 BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258
+FLASH_SIZE = 512K
 TAMPER_SWITCH_TYPE = NO
+
+TAMPER_NO = tamper_no
+TAMPER_NC = tamper_nc
  
 ifeq ($(TAMPER_SWITCH_TYPE),NC)
-	TAMPER_NAME = tamper_nc
+	TAMPER_NAME = $(TAMPER_NC)
 	TAMPER_SWITCH = -DTAMPER_SWITCH_NC=1
 else
-	TAMPER_NAME = tamper_no
+	TAMPER_NAME = $(TAMPER_NO)
 	TAMPER_SWITCH = -DTAMPER_SWITCH_NC=0
 endif
+
+ifeq ($(FLASH_SIZE),512K)
+	VF_ADDRESS = 0x78100
+else
+	VF_ADDRESS = 0xFD100
+endif
+
 
 SDK_PATH := ./tl_zigbee_sdk
 SRC_PATH := ./src
@@ -125,12 +136,20 @@ all: pre-build main-build
 flash: $(BIN_FILE)
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s -m we 0 $(BIN_FILE)
 	
+flash-tamper-nc:
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s -m we 0 $(PROJECT_NAME)_$(TAMPER_NC)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+		
+flash-tamper-no:
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s -m we 0 $(PROJECT_NAME)_$(TAMPER_NO)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+	
 flash-vf: $(BIN_FILE)
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s -m wf 0x770c0 voltage_factor.bin
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s -m wf $(VF_ADDRESS) voltage_factor.bin
 	
 erase-flash:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s es 0 0x77000
-#	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s ea
+
+erase-full-flash:
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s ea
 
 reset:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s -t50 -a2550 -m -w i
